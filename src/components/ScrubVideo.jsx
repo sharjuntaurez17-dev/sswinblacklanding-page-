@@ -26,6 +26,17 @@ export default function ScrubVideo({ src, poster, triggerRef, onProgress }) {
     if (video.readyState >= 1) setDuration()
     else video.addEventListener('loadedmetadata', setDuration, { once: true })
 
+    // Prime the decoder: briefly play+pause (muted) so the first frames are
+    // decoded and the element always has a painted frame to show. Without this
+    // the video can render blank until it has played once.
+    const prime = () => {
+      const p = video.play()
+      if (p && p.then) p.then(() => video.pause()).catch(() => {})
+      else video.pause()
+    }
+    if (video.readyState >= 2) prime()
+    else video.addEventListener('loadeddata', prime, { once: true })
+
     if (reduce) {
       video.preload = 'metadata'
       return
@@ -42,13 +53,22 @@ export default function ScrubVideo({ src, poster, triggerRef, onProgress }) {
       },
     })
 
+    // Throttle seeks to the decoder's pace: never start a new seek while one is
+    // still in progress (that pile-up is what causes dropped/blank frames).
+    let seeking = false
+    const onSeeked = () => { seeking = false }
+    video.addEventListener('seeked', onSeeked)
+
     let raf
     const tick = () => {
       current.current += (target.current - current.current) * 0.12
-      const t = current.current * (duration.current || 0)
-      if (Number.isFinite(t)) {
-        if (video.fastSeek) video.fastSeek(t)
-        else video.currentTime = t
+      const dur = duration.current || 0
+      const t = current.current * dur
+      // Reason: precise currentTime (not fastSeek) paints the exact frame; only
+      // issue a seek when the previous one finished and the delta is meaningful.
+      if (!seeking && dur && Number.isFinite(t) && Math.abs(video.currentTime - t) > 0.02) {
+        seeking = true
+        video.currentTime = t
       }
       raf = requestAnimationFrame(tick)
     }
@@ -58,6 +78,8 @@ export default function ScrubVideo({ src, poster, triggerRef, onProgress }) {
       cancelAnimationFrame(raf)
       st.kill()
       video.removeEventListener('loadedmetadata', setDuration)
+      video.removeEventListener('loadeddata', prime)
+      video.removeEventListener('seeked', onSeeked)
     }
   }, [triggerRef, onProgress])
 
