@@ -28,7 +28,7 @@ export default function Highlights({ bagSrc }) {
   }, [])
 
   return (
-    <section className="highlights" ref={ref}>
+    <section className="highlights" id="product" ref={ref}>
       <div className="highlights__media">
         <img
           className="highlights__bag"

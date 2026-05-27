@@ -18,7 +18,7 @@ export default function Story() {
   }, [])
 
   return (
-    <section className="story" ref={ref}>
+    <section className="story" id="about" ref={ref}>
       <div className="story__inner">
         <span className="kicker">Since 1998</span>
         <h2 className="story__title">27 years of milling excellence.</h2>

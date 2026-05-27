@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" id="contact">
       <div className="footer__mark">
         MUTHU WIN <span className="dot">·</span> SS <span className="dot">·</span> KANGAYAM
       </div>

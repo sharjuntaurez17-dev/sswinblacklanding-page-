@@ -1,4 +1,5 @@
 import { useLenis } from './hooks/useLenis.js'
+import Nav from './components/Nav.jsx'
 import Hero from './sections/Hero.jsx'
 import ScrubStory from './sections/ScrubStory.jsx'
 import Highlights from './sections/Highlights.jsx'
@@ -13,6 +14,7 @@ export default function App() {
 
   return (
     <main>
+      <Nav />
       <Hero videoSrc={VIDEO} />
       <ScrubStory videoSrc={VIDEO} poster={BAG} />
       <Highlights bagSrc={BAG} />

@@ -1,0 +1,35 @@
+import { useEffect, useState } from 'react'
+import { scrollToId } from '../hooks/useLenis.js'
+
+const LINKS = [
+  { label: 'Home', target: '#home' },
+  { label: 'Product', target: '#product' },
+  { label: 'About', target: '#about' },
+  { label: 'Contact', target: '#contact' },
+]
+
+export default function Nav() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <nav className={`nav${scrolled ? ' is-scrolled' : ''}`}>
+      <button className="nav__brand" onClick={() => scrollToId('#home')}>
+        MUTHU WIN <span className="green">S</span><span className="red">S</span>
+      </button>
+      <ul className="nav__links">
+        {LINKS.map((l) => (
+          <li key={l.target}>
+            <button onClick={() => scrollToId(l.target)}>{l.label}</button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
