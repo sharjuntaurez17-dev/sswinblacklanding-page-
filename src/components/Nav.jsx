@@ -5,6 +5,7 @@ const LINKS = [
   { label: 'Home', target: '#home' },
   { label: 'Product', target: '#product' },
   { label: 'About', target: '#about' },
+  { label: 'Order', target: '#order' },
   { label: 'Contact', target: '#contact' },
 ]
 
