@@ -1,16 +1,14 @@
+import { useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
 import { PRODUCT } from '../lib/product.js'
-import { scrollToId } from '../hooks/useLenis.js'
 
 export default function CartDrawer() {
   const { qty, inc, dec, setQty, isOpen, closeCart } = useCart()
+  const [notice, setNotice] = useState(false)
   const subtotal = qty * PRODUCT.pricePerBag
 
-  const checkout = () => {
-    closeCart()
-    // Let the drawer close, then scroll to the checkout form.
-    setTimeout(() => scrollToId('#order'), 250)
-  }
+  // Checkout/payment is wired up in a later phase. For now show a short notice.
+  const checkout = () => setNotice(true)
 
   return (
     <>
@@ -45,6 +43,7 @@ export default function CartDrawer() {
             <strong>₹{subtotal.toLocaleString('en-IN')}</strong>
           </div>
           <button className="cart__checkout" onClick={checkout}>Proceed to checkout</button>
+          {notice && <p className="cart__notice">Online checkout is coming soon. Please contact us to place your order.</p>}
           <button className="cart__continue" onClick={closeCart}>Continue browsing</button>
         </div>
       </aside>

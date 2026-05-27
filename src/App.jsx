@@ -5,7 +5,6 @@ import CartDrawer from './components/CartDrawer.jsx'
 import Hero from './sections/Hero.jsx'
 import Highlights from './sections/Highlights.jsx'
 import Story from './sections/Story.jsx'
-import Order from './sections/Order.jsx'
 import Footer from './sections/Footer.jsx'
 
 const VIDEO = '/ss-win-commercial.mp4'
@@ -21,7 +20,6 @@ export default function App() {
         <Hero videoSrc={VIDEO} />
         <Highlights bagSrc={BAG} />
         <Story />
-        <Order bagSrc={BAG} />
         <Footer />
       </main>
       <CartDrawer />

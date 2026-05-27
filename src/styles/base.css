@@ -274,6 +274,10 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
   text-transform: uppercase; font-size: .85rem; transition: background .2s ease;
 }
 .cart__checkout:hover { background: var(--gold-soft); }
+.cart__notice {
+  margin-top: .9rem; text-align: center; color: var(--gold-soft);
+  font-size: .82rem; line-height: 1.5;
+}
 .cart__continue {
   width: 100%; background: none; border: 0; cursor: pointer; margin-top: .8rem;
   color: var(--muted); font-size: .82rem; letter-spacing: .04em;
