@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Tamil:wght@500;600;700&display=swap');
+
+:root {
+  --bg: #0a0a0a;
+  --bg-soft: #141210;
+  --gold: #d4af37;
+  --gold-soft: #e8d488;
+  --green: #1e8f3e;
+  --red: #d12027;
+  --text: #f2ede1;
+  --muted: #9a948a;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-tamil: 'Noto Sans Tamil', 'Inter', sans-serif;
+
+  --maxw: 1200px;
+}
