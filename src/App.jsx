@@ -7,7 +7,7 @@ import Story from './sections/Story.jsx'
 import Footer from './sections/Footer.jsx'
 
 const VIDEO = '/ss-win-commercial.mp4'
-const BAG = '/ss-win-bag.webp'
+const BAG = '/ss-win-bag.png'
 
 export default function App() {
   useLenis()

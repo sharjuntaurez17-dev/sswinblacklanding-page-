@@ -155,7 +155,12 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
 }
 .highlights__media { display: flex; justify-content: center; }
 .highlights__bag {
-  max-height: 80vh; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.7));
+  max-height: 80vh;
+  /* The render ships on a light studio background — frame it as a rounded
+     product card so it reads intentionally against the dark section. */
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  border: 1px solid rgba(212,175,55,0.18);
   will-change: transform;
 }
 .bag-placeholder {
