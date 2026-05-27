@@ -1,16 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useCart } from '../context/CartContext.jsx'
-import { PRODUCT } from '../lib/product.js'
+import { PACKS } from '../lib/product.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const CHIPS = ['26 kg', 'Sortex Rice', 'Ponni', '100% Satisfaction', 'Naturally Rich']
+const CHIPS = ['Sortex Rice', 'Ponni', '100% Satisfaction', 'Naturally Rich']
 
 export default function Highlights({ bagSrc }) {
   const ref = useRef(null)
-  const { openCart } = useCart()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -22,7 +20,7 @@ export default function Highlights({ bagSrc }) {
         scrollTrigger: { trigger: '.chips', start: 'top 85%' },
         y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out',
       })
-      gsap.from(['.highlights__title', '.highlights__lead', '.highlights__buy'], {
+      gsap.from(['.highlights__title', '.highlights__lead', '.highlights__packs'], {
         scrollTrigger: { trigger: ref.current, start: 'top 70%' },
         y: 30, opacity: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out',
       })
@@ -45,9 +43,13 @@ export default function Highlights({ bagSrc }) {
             <span className="chip" key={c}>{c}</span>
           ))}
         </div>
-        <div className="highlights__buy">
-          <span className="highlights__price">₹{PRODUCT.pricePerBag.toLocaleString('en-IN')} <small>/ 26kg bag</small></span>
-          <button className="buy-btn" onClick={openCart}>Buy Now</button>
+        <div className="highlights__packs">
+          {PACKS.map((p) => (
+            <div className="pack" key={p.size}>
+              <span className="pack__size">{p.size}</span>
+              <span className="pack__price">₹{p.price.toLocaleString('en-IN')}</span>
+            </div>
+          ))}
         </div>
       </div>
 

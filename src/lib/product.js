@@ -1,7 +1,15 @@
-// Single source of truth for the product + pricing (shared by cart, order, etc.)
+// Single source of truth for the product + pricing (shared by cart, etc.)
 export const PRODUCT = {
-  name: 'MUTHU WIN SS — 26kg Sortex Ponni Rice',
-  shortName: '26kg Sortex Ponni Rice',
-  pricePerBag: 1500, // ₹ per 26kg bag (placeholder — set the real price here)
+  name: 'MUTHU WIN SS — Sortex Ponni Rice',
+  shortName: 'Sortex Ponni Rice',
+  pricePerBag: 1500, // ₹ for the default (26kg) pack used by the cart
   image: '/ss-win-bag.png',
 }
+
+// Available pack sizes shown on the product section.
+// NOTE: 10kg & 5kg prices are placeholders — replace with the real prices.
+export const PACKS = [
+  { size: '26 kg', price: 1500 },
+  { size: '10 kg', price: 600 },
+  { size: '5 kg', price: 320 },
+]

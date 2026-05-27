@@ -218,17 +218,14 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
   opacity: 0; transform: translateY(14px);
 }
 
-.highlights__buy { margin-top: 2.2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-.highlights__price { font-family: var(--font-serif); font-size: 1.8rem; color: var(--gold); }
-.highlights__price small { font-family: var(--font-sans); font-size: .8rem; color: var(--muted); letter-spacing: .04em; }
-.buy-btn {
-  background: var(--gold); color: #0a0a0a; border: 0; cursor: pointer;
-  padding: .95rem 2rem; border-radius: 999px; font-weight: 700;
-  letter-spacing: .08em; text-transform: uppercase; font-size: .85rem;
-  transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
-  box-shadow: 0 10px 30px rgba(212,175,55,0.25);
+.highlights__packs { margin-top: 2.2rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+.pack {
+  display: flex; flex-direction: column; gap: .25rem;
+  border: 1px solid rgba(212,175,55,0.3); border-radius: 12px;
+  padding: .85rem 1.3rem; min-width: 96px; background: #141210;
 }
-.buy-btn:hover { background: var(--gold-soft); transform: translateY(-2px); }
+.pack__size { font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; color: var(--gold-soft); }
+.pack__price { font-family: var(--font-serif); font-size: 1.5rem; color: var(--gold); }
 
 /* ---- Cart drawer ---- */
 .cart-overlay {
