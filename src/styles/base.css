@@ -91,10 +91,9 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
 }
 .hero__veil {
   position: absolute; inset: 0;
-  /* Keep the video clearly visible while keeping the centered wordmark legible. */
-  background:
-    radial-gradient(ellipse 60% 45% at center, rgba(10,10,10,0.62) 0%, rgba(10,10,10,0.18) 60%, rgba(10,10,10,0) 100%),
-    linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0) 22%, rgba(10,10,10,0) 78%, rgba(10,10,10,0.9) 100%);
+  /* No center vignette now that there's no text — keep only light top/bottom
+     fades for nav contrast and a smooth hand-off into the next section. */
+  background: linear-gradient(180deg, rgba(10,10,10,0.45) 0%, rgba(10,10,10,0) 18%, rgba(10,10,10,0) 80%, rgba(10,10,10,0.92) 100%);
 }
 .hero__inner { position: relative; z-index: 2; padding: 0 1.5rem; }
 .hero__wordmark {
