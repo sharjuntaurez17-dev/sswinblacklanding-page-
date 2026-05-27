@@ -1,5 +1,7 @@
 import { useLenis } from './hooks/useLenis.js'
+import { CartProvider } from './context/CartContext.jsx'
 import Nav from './components/Nav.jsx'
+import CartDrawer from './components/CartDrawer.jsx'
 import Hero from './sections/Hero.jsx'
 import ScrubStory from './sections/ScrubStory.jsx'
 import Highlights from './sections/Highlights.jsx'
@@ -14,14 +16,17 @@ export default function App() {
   useLenis()
 
   return (
-    <main>
-      <Nav />
-      <Hero videoSrc={VIDEO} />
-      <ScrubStory videoSrc={VIDEO} poster={BAG} />
-      <Highlights bagSrc={BAG} />
-      <Story />
-      <Order bagSrc={BAG} />
-      <Footer />
-    </main>
+    <CartProvider>
+      <main>
+        <Nav />
+        <Hero videoSrc={VIDEO} />
+        <ScrubStory videoSrc={VIDEO} poster={BAG} />
+        <Highlights bagSrc={BAG} />
+        <Story />
+        <Order bagSrc={BAG} />
+        <Footer />
+      </main>
+      <CartDrawer />
+    </CartProvider>
   )
 }

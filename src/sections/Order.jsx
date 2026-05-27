@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { submitOrder } from '../lib/orders.js'
+import { useCart } from '../context/CartContext.jsx'
+import { PRODUCT } from '../lib/product.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const PRICE_PER_BAG = 1500 // ₹ per 26kg bag (placeholder until pricing is set)
-
-const EMPTY = { name: '', phone: '', address: '', pincode: '', quantity: 1 }
+const EMPTY = { name: '', phone: '', address: '', pincode: '' }
 
 export default function Order({ bagSrc }) {
   const ref = useRef(null)
+  const { qty, setQty } = useCart()
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('idle') // idle | sending | done | error
@@ -33,7 +34,6 @@ export default function Order({ bagSrc }) {
     if (!/^\d{10}$/.test(form.phone.trim())) er.phone = 'Enter a 10-digit phone number'
     if (!form.address.trim()) er.address = 'Enter your delivery address'
     if (!/^\d{6}$/.test(form.pincode.trim())) er.pincode = 'Enter a 6-digit pincode'
-    if (!(Number(form.quantity) >= 1)) er.quantity = 'Quantity must be at least 1'
     setErrors(er)
     return Object.keys(er).length === 0
   }
@@ -43,8 +43,7 @@ export default function Order({ bagSrc }) {
     if (!validate()) return
     setStatus('sending')
     try {
-      const qty = Number(form.quantity)
-      await submitOrder({ ...form, quantity: qty, amount: qty * PRICE_PER_BAG * 100 })
+      await submitOrder({ ...form, quantity: qty, amount: qty * PRODUCT.pricePerBag * 100 })
       setStatus('done')
       setForm(EMPTY)
     } catch {
@@ -52,7 +51,7 @@ export default function Order({ bagSrc }) {
     }
   }
 
-  const total = (Number(form.quantity) || 0) * PRICE_PER_BAG
+  const total = qty * PRODUCT.pricePerBag
 
   return (
     <section className="order" id="order" ref={ref}>
@@ -99,8 +98,7 @@ export default function Order({ bagSrc }) {
                 </label>
                 <label className="order__field">
                   <span>Quantity (bags)</span>
-                  <input type="number" min="1" value={form.quantity} onChange={set('quantity')} />
-                  {errors.quantity && <em>{errors.quantity}</em>}
+                  <input type="number" min="1" value={qty} onChange={(e) => setQty(Number(e.target.value))} />
                 </label>
               </div>
 
