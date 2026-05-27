@@ -50,38 +50,62 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(212,175,55,0.18);
 }
+/* Centered logo (true center, like the reference) */
 .nav__brand {
+  position: absolute; left: 50%; transform: translateX(-50%);
   background: none; border: 0; cursor: pointer; padding: 0;
   display: flex; align-items: center;
 }
 .nav__logo {
-  height: 48px; width: 48px; border-radius: 50%; object-fit: cover;
+  height: 50px; width: 50px; border-radius: 50%; object-fit: cover;
   background: #fff; box-shadow: 0 2px 14px rgba(0,0,0,0.45);
 }
-.nav__right { display: flex; align-items: center; gap: clamp(1rem, 3vw, 2rem); }
-.nav__links { list-style: none; display: flex; gap: clamp(1rem, 3vw, 2.4rem); }
-.nav__cart {
-  position: relative; background: none; border: 0; cursor: pointer;
-  font-size: 1.2rem; line-height: 1; padding: .2rem;
+
+/* Pill buttons (MENU / BUY NOW) */
+.nav__menu-btn, .nav__buy {
+  display: inline-flex; align-items: center; gap: .6rem; cursor: pointer;
+  background: var(--gold); color: #0a0a0a; border: 0;
+  padding: .6rem 1.15rem; border-radius: 999px;
+  font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .72rem;
+  transition: transform .15s ease, background .2s ease;
 }
-.nav__cart-count {
-  position: absolute; top: -6px; right: -8px;
-  background: var(--red); color: #fff; font-size: .62rem; font-weight: 700;
-  min-width: 16px; height: 16px; border-radius: 999px;
-  display: flex; align-items: center; justify-content: center; padding: 0 4px;
+.nav__menu-btn:hover, .nav__buy:hover { background: var(--gold-soft); transform: translateY(-1px); }
+
+.nav__burger { display: inline-flex; flex-direction: column; gap: 3px; }
+.nav__burger i { width: 16px; height: 2px; background: #0a0a0a; border-radius: 2px; }
+
+.nav__buy-icon { position: relative; font-size: .95rem; line-height: 1; }
+.nav__buy-count {
+  position: absolute; top: -8px; right: -10px;
+  background: var(--red); color: #fff; font-size: .6rem; font-weight: 700;
+  min-width: 15px; height: 15px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center; padding: 0 3px;
 }
-.nav__links button {
+
+/* Full-screen menu overlay */
+.menu-overlay {
+  position: fixed; inset: 0; z-index: 70;
+  background: rgba(8,7,6,0.97); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s ease;
+}
+.menu-overlay.is-open { opacity: 1; visibility: visible; }
+.menu-overlay__close {
+  position: absolute; top: 1.4rem; right: 2rem;
+  background: none; border: 0; color: var(--gold); font-size: 2.6rem; line-height: 1; cursor: pointer;
+}
+.menu-overlay__links { list-style: none; text-align: center; display: flex; flex-direction: column; gap: 1.2rem; }
+.menu-overlay__links button {
   background: none; border: 0; cursor: pointer;
-  font-family: var(--font-sans); font-weight: 500;
-  text-transform: uppercase; letter-spacing: .16em; font-size: .72rem;
-  color: var(--text); opacity: .8; transition: opacity .2s ease, color .2s ease;
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(2rem, 6vw, 3.5rem); color: var(--text);
+  letter-spacing: .02em; transition: color .2s ease, transform .2s ease;
 }
-.nav__links button:hover { opacity: 1; color: var(--gold); }
+.menu-overlay__links button:hover { color: var(--gold); transform: translateX(6px); }
 
 @media (max-width: 560px) {
-  .nav__links { gap: 1rem; }
-  .nav__links button { font-size: .64rem; letter-spacing: .1em; }
-  .nav__brand { font-size: 1rem; }
+  .nav__menu-btn, .nav__buy { padding: .55rem .8rem; font-size: .62rem; letter-spacing: .08em; }
+  .nav__logo { height: 42px; width: 42px; }
 }
 
 /* ---- Hero ---- */
