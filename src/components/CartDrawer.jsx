@@ -17,7 +17,7 @@ export default function CartDrawer() {
       <div className={`cart-overlay${isOpen ? ' is-open' : ''}`} onClick={closeCart} />
       <aside className={`cart${isOpen ? ' is-open' : ''}`} aria-hidden={!isOpen}>
         <div className="cart__head">
-          <h3>Your Cart</h3>
+          <h3>Your Bag</h3>
           <button className="cart__close" onClick={closeCart} aria-label="Close cart">×</button>
         </div>
 
