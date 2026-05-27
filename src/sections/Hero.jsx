@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
-import ScrollCue from '../components/ScrollCue.jsx'
 
 export default function Hero({ videoSrc }) {
   const ref = useRef(null)
@@ -25,7 +24,6 @@ export default function Hero({ videoSrc }) {
           27 Years of Excellence &nbsp;·&nbsp; <span className="tamil">27 ஆண்டுகால சிறப்பு</span>
         </p>
       </div>
-      <ScrollCue />
     </header>
   )
 }
