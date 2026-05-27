@@ -13,7 +13,7 @@ const LINKS = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const { qty, openCart } = useCart()
+  const { openCart } = useCart()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -44,7 +44,6 @@ export default function Nav() {
         {/* Right: BUY NOW */}
         <button className="nav__buy" onClick={openCart} aria-label="Buy now — open cart">
           Buy Now
-          {qty > 0 && <span className="nav__buy-count">{qty}</span>}
         </button>
       </nav>
 
