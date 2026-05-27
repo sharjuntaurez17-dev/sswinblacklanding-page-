@@ -44,7 +44,7 @@ export default function Nav() {
         {/* Right: BUY NOW */}
         <button className="nav__buy" onClick={openCart} aria-label="Buy now — open cart">
           Buy Now
-          <span className="nav__buy-icon">🛒{qty > 0 && <span className="nav__buy-count">{qty}</span>}</span>
+          {qty > 0 && <span className="nav__buy-count">{qty}</span>}
         </button>
       </nav>
 

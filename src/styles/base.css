@@ -74,12 +74,10 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
 .nav__burger { display: inline-flex; flex-direction: column; gap: 3px; }
 .nav__burger i { width: 16px; height: 2px; background: #0a0a0a; border-radius: 2px; }
 
-.nav__buy-icon { position: relative; font-size: .95rem; line-height: 1; }
 .nav__buy-count {
-  position: absolute; top: -8px; right: -10px;
-  background: var(--red); color: #fff; font-size: .6rem; font-weight: 700;
-  min-width: 15px; height: 15px; border-radius: 999px;
-  display: flex; align-items: center; justify-content: center; padding: 0 3px;
+  background: var(--red); color: #fff; font-size: .62rem; font-weight: 700;
+  min-width: 16px; height: 16px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0 4px;
 }
 
 /* Full-screen menu overlay */
