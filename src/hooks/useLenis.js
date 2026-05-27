@@ -12,7 +12,7 @@ let lenisInstance = null
 export function scrollToId(selector) {
   const el = document.querySelector(selector)
   if (!el) return
-  if (lenisInstance) lenisInstance.scrollTo(el, { offset: -56 })
+  if (lenisInstance) lenisInstance.scrollTo(el, { offset: -68 })
   else el.scrollIntoView({ behavior: 'smooth' })
 }
 

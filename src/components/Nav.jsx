@@ -20,8 +20,8 @@ export default function Nav() {
 
   return (
     <nav className={`nav${scrolled ? ' is-scrolled' : ''}`}>
-      <button className="nav__brand" onClick={() => scrollToId('#home')}>
-        MUTHU WIN <span className="green">S</span><span className="red">S</span>
+      <button className="nav__brand" onClick={() => scrollToId('#home')} aria-label="MUTHU WIN SS KANGAYAM — Home">
+        <img className="nav__logo" src="/winss-logo.webp" alt="MUTHU WIN SS KANGAYAM" />
       </button>
       <ul className="nav__links">
         {LINKS.map((l) => (

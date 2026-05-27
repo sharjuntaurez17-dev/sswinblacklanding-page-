@@ -39,7 +39,7 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
 /* ---- Nav ---- */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-  height: 56px; padding: 0 clamp(1.2rem, 4vw, 3rem);
+  height: 68px; padding: 0 clamp(1.2rem, 4vw, 3rem);
   display: flex; align-items: center; justify-content: space-between;
   background: transparent;
   transition: background .35s ease, border-color .35s ease, backdrop-filter .35s ease;
@@ -51,11 +51,13 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
   border-bottom: 1px solid rgba(212,175,55,0.18);
 }
 .nav__brand {
-  background: none; border: 0; cursor: pointer;
-  font-family: var(--font-serif); font-weight: 700;
-  font-size: 1.15rem; letter-spacing: .12em; color: var(--gold);
+  background: none; border: 0; cursor: pointer; padding: 0;
+  display: flex; align-items: center;
 }
-.nav__brand .green { font-style: normal; }
+.nav__logo {
+  height: 48px; width: 48px; border-radius: 50%; object-fit: cover;
+  background: #fff; box-shadow: 0 2px 14px rgba(0,0,0,0.45);
+}
 .nav__links { list-style: none; display: flex; gap: clamp(1rem, 3vw, 2.4rem); }
 .nav__links button {
   background: none; border: 0; cursor: pointer;
