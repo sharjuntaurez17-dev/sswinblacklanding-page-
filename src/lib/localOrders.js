@@ -4,6 +4,30 @@
 
 const KEY = 'sswin.orders.v1'
 
+// How long after placing an order we consider it delivered (matches the
+// "2-3 days" ETA shown in tracking). A real backend can override this by
+// setting order.status = 'delivered' explicitly.
+export const DELIVERY_WINDOW_MS = 2 * 24 * 60 * 60 * 1000 // 2 days
+
+// True once the order is delivered — either flagged by the backend/status, or
+// because its delivery window has elapsed.
+export function isDelivered(order) {
+  if (!order) return false
+  if (order.status === 'delivered' || order.deliveredAt) return true
+  return !!order.placedAt && (Date.now() - order.placedAt) >= DELIVERY_WINDOW_MS
+}
+
+// Persist an explicit status for an order (used by the tracking write-back and
+// future backend sync).
+export function setOrderStatus(id, status) {
+  const all = readRaw()
+  const o = all.find((x) => x.orderId === id)
+  if (!o) return
+  o.status = status
+  if (status === 'delivered' && !o.deliveredAt) o.deliveredAt = Date.now()
+  writeRaw(all)
+}
+
 function readRaw() {
   try {
     const s = localStorage.getItem(KEY)

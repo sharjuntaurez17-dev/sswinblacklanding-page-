@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
+import { getOrder, isDelivered, setOrderStatus } from '../lib/localOrders.js'
 
 // Stages every order goes through.
 const STAGES = [
@@ -68,6 +69,17 @@ export default function Track() {
         }
         if (data.eta) eta = data.eta
       }
+
+      // Fall back to the locally-saved order: once its delivery window has
+      // elapsed (or it's flagged delivered), show the final stage and persist
+      // the delivered status so Your Orders shows the green badge.
+      const local = getOrder(v)
+      if (local && isDelivered(local)) {
+        stageIndex = STAGES.length - 1 // Delivered
+        eta = 'Delivered'
+        setOrderStatus(v, 'delivered')
+      }
+
       // Smooth perceived delay for the spinner
       await new Promise((r) => setTimeout(r, 500))
       setStatus({ id: v, stageIndex, eta })

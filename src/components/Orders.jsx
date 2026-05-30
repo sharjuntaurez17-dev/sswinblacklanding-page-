@@ -1,7 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
 import { PRODUCT } from '../lib/product.js'
-import { getOrders } from '../lib/localOrders.js'
+import { getOrders, isDelivered } from '../lib/localOrders.js'
+
+// Green check-circle (recreates the delivered logo as an inline SVG).
+function DeliveredIcon() {
+  return (
+    <svg className="delivered-badge__icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="11" fill="#6cbf3f" />
+      <path
+        d="M7 12.5l3.2 3.2L17 9"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
 
 function fmtDate(ts) {
   try {
@@ -61,7 +78,9 @@ export default function Orders() {
               </div>
 
               <ul className="orders__list">
-                {orders.map((o) => (
+                {orders.map((o) => {
+                  const delivered = isDelivered(o)
+                  return (
                   <li key={o.orderId} className="order-card">
                     <header className="order-card__head">
                       <div>
@@ -70,6 +89,24 @@ export default function Orders() {
                       </div>
                       <span className="order-card__date">{fmtDate(o.placedAt)}</span>
                     </header>
+
+                    {(o.name || o.address) && (
+                      <div className="order-card__ship">
+                        <span className="order-card__ship-label">Delivering to</span>
+                        <div className="order-card__ship-body">
+                          {o.name && (
+                            <strong className="order-card__ship-name">
+                              {o.name}{o.phone ? ` · +91 ${o.phone}` : ''}
+                            </strong>
+                          )}
+                          {(o.address || o.city || o.pincode) && (
+                            <span className="order-card__ship-addr">
+                              {[o.address, o.city, o.pincode].filter(Boolean).join(', ')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     <ul className="order-card__items">
                       {(o.items || []).map((it) => (
@@ -90,17 +127,25 @@ export default function Orders() {
                         <strong>₹{(o.subtotal ?? 0).toLocaleString('en-IN')}</strong>
                       </div>
                       <div className="order-card__actions">
-                        <button
-                          type="button"
-                          className="co-place order-card__btn"
-                          onClick={() => openTrack(o.orderId)}
-                        >
-                          Track
-                        </button>
+                        {delivered ? (
+                          <span className="delivered-badge">
+                            <DeliveredIcon />
+                            Delivered
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="co-place order-card__btn"
+                            onClick={() => openTrack(o.orderId)}
+                          >
+                            Track
+                          </button>
+                        )}
                       </div>
                     </footer>
                   </li>
-                ))}
+                  )
+                })}
               </ul>
 
               <p className="orders__note">
