@@ -12,7 +12,9 @@ const LINKS = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const { openCart } = useCart()
+  const { openCart, openTrack, openOrders, openAuth, currentUser } = useCart()
+  const firstName = currentUser?.name?.split(/\s+/)[0] || ''
+  const initial = firstName ? firstName.charAt(0).toUpperCase() : ''
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -29,11 +31,24 @@ export default function Nav() {
   return (
     <>
       <nav className={`nav${scrolled ? ' is-scrolled' : ''}`}>
-        {/* Left: MENU */}
-        <button className="nav__menu-btn" onClick={() => setMenuOpen(true)} aria-label="Open menu">
-          <span className="nav__burger"><i /><i /><i /></span>
-          Menu
-        </button>
+        {/* Left: MENU + LOGIN */}
+        <div className="nav__left">
+          <button className="nav__menu-btn" onClick={() => setMenuOpen(true)} aria-label="Open menu">
+            <span className="nav__burger"><i /><i /><i /></span>
+            Menu
+          </button>
+
+          {currentUser ? (
+            <button className="nav__auth nav__auth--in" onClick={openAuth} aria-label={`Account: ${firstName}`}>
+              <span className="nav__auth-avatar" aria-hidden="true">{initial}</span>
+              <span className="nav__auth-name">{firstName}</span>
+            </button>
+          ) : (
+            <button className="nav__auth" onClick={openAuth} aria-label="Log in or sign up">
+              Login / Sign up
+            </button>
+          )}
+        </div>
 
         {/* Center: logo */}
         <button className="nav__brand" onClick={() => scrollToId('#home')} aria-label="MUTHU WIN SS KANGAYAM — Home">
@@ -55,6 +70,16 @@ export default function Nav() {
               <button onClick={() => go(l.target)}>{l.label}</button>
             </li>
           ))}
+          <li>
+            <button onClick={() => { setMenuOpen(false); setTimeout(() => openTrack(), 220) }}>
+              Track Order
+            </button>
+          </li>
+          <li>
+            <button onClick={() => { setMenuOpen(false); setTimeout(() => openOrders(), 220) }}>
+              Your Orders
+            </button>
+          </li>
         </ul>
       </div>
     </>

@@ -1,14 +1,15 @@
-import { useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
 import { PRODUCT } from '../lib/product.js'
 
 export default function CartDrawer() {
-  const { qty, inc, dec, setQty, isOpen, closeCart } = useCart()
-  const [notice, setNotice] = useState(false)
-  const subtotal = qty * PRODUCT.pricePerBag
+  const {
+    lines, totalQty, subtotal,
+    inc, dec, setQty,
+    isOpen, closeCart,
+    openCheckout,
+  } = useCart()
 
-  // Checkout/payment is wired up in a later phase. For now show a short notice.
-  const checkout = () => setNotice(true)
+  const checkout = () => openCheckout()
 
   return (
     <>
@@ -19,31 +20,45 @@ export default function CartDrawer() {
           <button className="cart__close" onClick={closeCart} aria-label="Close cart">×</button>
         </div>
 
-        <div className="cart__item">
-          <img src={PRODUCT.image} alt={PRODUCT.name} />
-          <div className="cart__item-info">
-            <strong>{PRODUCT.shortName}</strong>
-            <span>₹{PRODUCT.pricePerBag.toLocaleString('en-IN')} / bag</span>
-            <div className="cart__qty">
-              <button onClick={dec} aria-label="Decrease quantity">−</button>
-              <input
-                value={qty}
-                onChange={(e) => setQty(Number(e.target.value))}
-                inputMode="numeric"
-                aria-label="Quantity"
-              />
-              <button onClick={inc} aria-label="Increase quantity">+</button>
+        <div className="cart__lines">
+          {lines.map((line) => (
+            <div key={line.size} className="cart__line">
+              <img src={PRODUCT.image} alt={`${PRODUCT.shortName} ${line.size}`} />
+              <div className="cart__line-info">
+                <strong>{PRODUCT.shortName}</strong>
+                <span className="cart__line-size">{line.size}</span>
+                <span className="cart__line-price">₹{line.price.toLocaleString('en-IN')} / bag</span>
+
+                <div className="cart__qty">
+                  <button onClick={() => dec(line.size)} aria-label={`Decrease ${line.size}`}>−</button>
+                  <input
+                    value={line.qty}
+                    onChange={(e) => setQty(line.size, e.target.value)}
+                    inputMode="numeric"
+                    aria-label={`${line.size} quantity`}
+                  />
+                  <button onClick={() => inc(line.size)} aria-label={`Increase ${line.size}`}>+</button>
+                </div>
+              </div>
+              <div className="cart__line-subtotal">
+                ₹{line.subtotal.toLocaleString('en-IN')}
+              </div>
             </div>
-          </div>
+          ))}
         </div>
 
         <div className="cart__foot">
           <div className="cart__subtotal">
-            <span>Subtotal</span>
+            <span>Subtotal{totalQty > 0 ? ` (${totalQty} bag${totalQty === 1 ? '' : 's'})` : ''}</span>
             <strong>₹{subtotal.toLocaleString('en-IN')}</strong>
           </div>
-          <button className="cart__checkout" onClick={checkout}>Proceed to checkout</button>
-          {notice && <p className="cart__notice">Online checkout is coming soon. Please contact us to place your order.</p>}
+          <button
+            className="cart__checkout"
+            onClick={checkout}
+            disabled={totalQty === 0}
+          >
+            Proceed to checkout
+          </button>
           <button className="cart__continue" onClick={closeCart}>Continue browsing</button>
         </div>
       </aside>

@@ -20,15 +20,15 @@ export default function Story() {
   return (
     <section className="story" id="about" ref={ref}>
       <div className="story__inner">
-        <span className="kicker">Since 1998</span>
-        <h2 className="story__title">27 years of milling excellence.</h2>
+        <span className="kicker">Since 1963</span>
+        <h2 className="story__title">Six decades of milling excellence.</h2>
         <p className="story__p">
           From the heart of Kangayam, the MUTHU WIN SS name has stood for trust on
-          every kitchen shelf for over 27 years — bringing families premium, naturally
-          rich Ponni rice, milled and Sortex-sorted to an uncompromising standard.
+          every kitchen shelf for over 60 years — bringing families premium, naturally
+          rich Nei Kichadi Ponni rice, milled and Sortex-sorted to an uncompromising standard.
         </p>
         <p className="story__p tamil">
-          கங்கயம் மண்ணில் இருந்து 27 ஆண்டுகளாக, முத்து வின் எஸ்.எஸ் பெயர்
+          கங்கயம் மண்ணில் இருந்து 60 ஆண்டுகளாக, முத்து வின் எஸ்.எஸ் பெயர்
           ஒவ்வொரு வீட்டிலும் நம்பிக்கையின் அடையாளமாக நிலைத்து நிற்கிறது.
         </p>
         <div className="rule" />

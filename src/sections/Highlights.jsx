@@ -5,7 +5,7 @@ import { PACKS } from '../lib/product.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const CHIPS = ['Sortex Rice', 'Ponni', '100% Satisfaction', 'Naturally Rich']
+const CHIPS = ['Nei Kichadi Ponni', 'Sortex Sorted', '100% Satisfaction', 'Naturally Rich']
 
 export default function Highlights({ bagSrc }) {
   const ref = useRef(null)
@@ -32,11 +32,11 @@ export default function Highlights({ bagSrc }) {
     <section className="highlights" id="product" ref={ref}>
       {/* Left: copy + Buy Now */}
       <div className="highlights__copy">
-        <span className="kicker">Premium Sortex Ponni</span>
+        <span className="kicker">Premium Nei Kichadi Ponni</span>
         <h2 className="highlights__title">Every grain, perfected.</h2>
         <p className="highlights__lead">
           Multi-stage Sortex colour sorting removes every impurity, leaving only
-          clean, uniform, naturally rich Ponni grains — sealed fresh in our 26&nbsp;kg pack.
+          clean, uniform, naturally rich Nei Kichadi Ponni grains — sealed fresh in 5&nbsp;kg, 10&nbsp;kg and 26&nbsp;kg packs.
         </p>
         <div className="chips">
           {CHIPS.map((c) => (
@@ -58,7 +58,7 @@ export default function Highlights({ bagSrc }) {
         <img
           className="highlights__bag"
           src={bagSrc}
-          alt="MUTHU WIN SS KANGAYAM 26kg premium sortex rice bag"
+          alt="MUTHU WIN SS KANGAYAM Nei Kichadi Ponni premium rice bag"
           onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
         />
         <div className="bag-placeholder" style={{ display: 'none' }}>
