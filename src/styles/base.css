@@ -2262,3 +2262,98 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.05
 }
 .nav__care:hover { background: var(--gold); color: #1a1408; transform: translateY(-1px); }
 @media (max-width: 560px) { .nav__care { width: 34px; height: 34px; } }
+
+
+/* ---- Customer care: sections, tickets, rating ---- */
+.care__section { margin-top: 1.6rem; text-align: left; }
+.care__form { display: flex; flex-direction: column; gap: 1rem; }
+.care__form select {
+    background: #0a0a0a; border: 1px solid rgba(212,175,55,.2); color: var(--text);
+    padding: .85rem 1rem; border-radius: 10px; font: 500 .95rem/1.2 var(--font-sans); width: 100%; box-sizing: border-box;
+}
+.care__form select:focus { outline: none; border-color: var(--gold); }
+
+/* Raised / thanks confirmation */
+.care__raised { text-align: center; padding: 1rem .5rem; display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+.care__raised-icon { color: var(--gold); font-size: 1.8rem; line-height: 1; }
+.care__raised strong { color: var(--text); font-family: var(--font-serif); font-size: 1.3rem; }
+.care__ticket-id {
+    color: var(--gold); font-family: var(--font-serif); font-size: 1.5rem; letter-spacing: .04em;
+    user-select: all; background: #0a0a0a; border: 1px solid rgba(212,175,55,.3);
+    padding: .5rem 1rem; border-radius: 10px;
+}
+.care__raised-hint { color: var(--muted); font-size: .82rem; line-height: 1.5; max-width: 360px; }
+
+/* Ticket list */
+.care__tickets { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .7rem; }
+.care__ticket {
+    display: flex; flex-direction: column; gap: .3rem;
+    background: #0a0a0a; border: 1px solid rgba(212,175,55,.14); border-radius: 10px; padding: .9rem 1rem;
+}
+.care__ticket-head { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.care__ticket-head strong { color: var(--gold); font-family: var(--font-serif); font-size: 1.1rem; user-select: all; }
+.care__badge {
+    font: 700 .62rem/1 var(--font-sans); letter-spacing: .12em; text-transform: uppercase;
+    padding: .3rem .6rem; border-radius: 999px;
+}
+.care__badge--open { background: rgba(212,175,55,.16); color: var(--gold); }
+.care__badge--closed { background: rgba(31,138,58,.18); color: #67e187; }
+.care__ticket-order { color: var(--muted); font-size: .76rem; letter-spacing: .04em; }
+.care__ticket-msg { color: var(--text); font-size: .88rem; line-height: 1.45; }
+.care__ticket-date { color: var(--muted); font-size: .74rem; }
+
+/* Star rating */
+.care__stars { display: flex; gap: .35rem; }
+.care__star {
+    background: none; border: 0; cursor: pointer;
+    font-size: 2rem; line-height: 1; color: rgba(212,175,55,.3);
+    transition: color .15s ease, transform .15s ease;
+}
+.care__star:hover { transform: scale(1.12); }
+.care__star.is-on { color: var(--gold); text-shadow: 0 0 10px rgba(212,175,55,.5); }
+
+
+/* ---- Customer care: order-card ticket flow ---- */
+.care__orders-head { text-align: left; margin: 1.8rem 0 .8rem; color: var(--muted); font-family: var(--font-sans); font-size: .72rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+.care__none { color: var(--muted); font-size: .9rem; text-align: left; }
+.care__orders { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; text-align: left; }
+.care__order { padding: 0; overflow: hidden; }
+.care__order-toggle {
+    display: block; width: 100%; text-align: left;
+    background: none; border: 0; cursor: pointer; color: var(--text);
+    padding: 1.3rem 1.3rem 1.1rem;
+}
+.care__order-toggle:hover { background: rgba(212,175,55,.04); }
+.care__raise-hint { color: var(--gold); font: 700 .74rem/1 var(--font-sans); letter-spacing: .12em; text-transform: uppercase; }
+
+.care__panel {
+    border-top: 1px dashed rgba(212,175,55,.18);
+    padding: 1.1rem 1.3rem 1.3rem;
+    display: flex; flex-direction: column; gap: .9rem;
+}
+.care__shopcall {
+    display: inline-flex; align-items: center; gap: .4rem;
+    align-self: flex-start;
+    background: var(--gold); color: #1a1408; text-decoration: none;
+    padding: .55rem 1rem; border-radius: 8px;
+    font: 700 .76rem/1 var(--font-sans); letter-spacing: .06em;
+}
+.care__shopcall:hover { background: var(--gold-soft); }
+
+.care__ticket-row { display: flex; align-items: baseline; gap: .6rem; }
+.care__ticket-label { color: var(--muted); font-size: .68rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+.care__ticket-id-inline { color: var(--gold); font-family: var(--font-serif); font-size: 1.3rem; user-select: all; }
+.care__ticket-msg { color: var(--text); font-size: .88rem; line-height: 1.45; margin: 0; }
+
+.care__rate {
+    margin-top: .4rem; padding-top: .9rem;
+    border-top: 1px solid rgba(212,175,55,.12);
+    display: flex; flex-direction: column; gap: .7rem;
+}
+.care__rate-label { color: var(--text); font-family: var(--font-sans); font-size: .82rem; font-weight: 600; letter-spacing: .06em; }
+.care__improve {
+    background: #0a0a0a; border: 1px solid rgba(212,175,55,.2); color: var(--text);
+    padding: .8rem 1rem; border-radius: 10px; font: 500 .95rem/1.4 var(--font-sans); resize: vertical;
+}
+.care__improve:focus { outline: none; border-color: var(--gold); }
+.care__rated { color: #67e187; font-weight: 600; font-size: .9rem; }
