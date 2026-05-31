@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
+import { useLang } from '../context/LanguageContext.jsx'
 import { getOrder, isDelivered, setOrderStatus } from '../lib/localOrders.js'
 
-// Stages every order goes through.
+// Stages every order goes through (labels resolved via t() at render).
 const STAGES = [
-  { key: 'received',  label: 'Order Received',   desc: 'Weve received your order details.' },
-  { key: 'shipped',   label: 'Out for Delivery', desc: 'Your bags are on the way.' },
-  { key: 'delivered', label: 'Delivered',        desc: 'Enjoy! Wed love your feedback.' },
+  { key: 'received' },
+  { key: 'shipped' },
+  { key: 'delivered' },
 ]
 
 // Order IDs follow SSW-YYMMDD-XXXX  (4 unambiguous alphanumerics).
@@ -14,6 +15,7 @@ const ID_RE = /^SSW-\d{6}-[A-Z2-9]{4}$/i
 
 export default function Track() {
   const { isTrackOpen, closeTrack, trackTargetId } = useCart()
+  const { t } = useLang()
   const [id, setId] = useState('')
   const [error, setError] = useState('')
   const [status, setStatus] = useState(null) // null | { id, stageIndex, eta }
@@ -96,7 +98,7 @@ export default function Track() {
         <a className="checkout__brand" href="#home" onClick={closeTrack} aria-label="Home">
           <img className="checkout__logo" src="/winss-logo.webp" alt="MUTHU WIN SS KANGAYAM" />
         </a>
-        <h2 className="checkout__title">Track Order</h2>
+        <h2 className="checkout__title">{t('tk.title')}</h2>
         <button className="checkout__close" onClick={closeTrack} aria-label="Close">×</button>
       </div>
 
@@ -104,9 +106,9 @@ export default function Track() {
         <div className="track__wrap">
           {status ? (
             <div className="track__result">
-              <span className="track__kicker">Tracking</span>
+              <span className="track__kicker">{t('tk.tracking')}</span>
               <h3 className="track__id">{status.id}</h3>
-              <p className="track__eta">Estimated delivery: <strong>{status.eta}</strong></p>
+              <p className="track__eta">{t('tk.eta')} <strong>{status.eta}</strong></p>
 
               <ol className="track__stages">
                 {STAGES.map((s, i) => {
@@ -115,8 +117,8 @@ export default function Track() {
                     <li key={s.key} className={`track__stage is-${state}`}>
                       <span className="track__dot" aria-hidden="true" />
                       <div className="track__stage-info">
-                        <strong>{s.label}</strong>
-                        <span>{s.desc}</span>
+                        <strong>{t('tk.stage.' + s.key)}</strong>
+                        <span>{t('tk.stage.' + s.key + 'Desc')}</span>
                       </div>
                     </li>
                   )
@@ -124,22 +126,22 @@ export default function Track() {
               </ol>
 
               <div className="track__actions">
-                <button className="co-place" onClick={() => setStatus(null)}>Track another</button>
-                <button className="track__ghost" onClick={closeTrack}>Close</button>
+                <button className="co-place" onClick={() => setStatus(null)}>{t('tk.another')}</button>
+                <button className="track__ghost" onClick={closeTrack}>{t('tk.close')}</button>
               </div>
             </div>
           ) : (
             <form className="co-card track__card" onSubmit={onSubmit}>
               <header className="co-card__head">
-                <h3>Find Your Order</h3>
+                <h3>{t('tk.find')}</h3>
               </header>
 
               <p className="track__lead">
-                Enter the order ID we sent you on checkout. Format: <code>SSW-YYMMDD-XXXX</code>.
+                {t('tk.lead') !== 'tk.lead' ? t('tk.lead') : <>Enter the order ID we sent you on checkout. Format: <code>SSW-YYMMDD-XXXX</code>.</>}
               </p>
 
               <label className="co-field">
-                <span>Order ID<i>*</i></span>
+                <span>{t('tk.orderId')}<i>*</i></span>
                 <input
                   value={id}
                   onChange={(e) => setId(e.target.value)}
@@ -152,12 +154,8 @@ export default function Track() {
               </label>
 
               <button className="co-place" type="submit" disabled={loading}>
-                {loading ? 'Looking up…' : 'Track order'}
+                {loading ? t('tk.looking') : t('tk.btn')}
               </button>
-
-              <p className="co-note">
-                Cant find your ID? Call us and well look it up by your phone number.
-              </p>
             </form>
           )}
         </div>

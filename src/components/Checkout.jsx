@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
+import { useLang } from '../context/LanguageContext.jsx'
 import { PRODUCT } from '../lib/product.js'
 import { submitOrder, generateOrderId } from '../lib/orders.js'
 import { saveOrder as saveLocalOrder } from '../lib/localOrders.js'
 import { getAddresses, saveAddress, deleteAddress, ADDRESS_LABELS, labelOf, displayLabel } from '../lib/addressBook.js'
+import { priceFor, zoneForPincode, deliveryAvailable, shopForPincode } from '../lib/pricing.js'
 import SparklesText from './SparklesText.jsx'
 
 const EMPTY = {
@@ -20,7 +22,11 @@ export default function Checkout() {
     isCheckoutOpen, closeCheckout, clear,
     openTrack,
     currentUser,
+    selectedAddress,
+    fulfilment, setFulfilment,
   } = useCart()
+  const { t } = useLang()
+  const labelName = (id) => t('co.labels.' + id) // localized Home/Work/Friend/Other
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('idle')
@@ -43,13 +49,30 @@ export default function Checkout() {
   // and the user is signed in. Fields stay editable so they can still order
   // for someone else.
   useEffect(() => {
-    if (isCheckoutOpen && currentUser) {
-      setForm((f) => ({ ...f,
-        name: f.name || currentUser.name || '',
-        phone: f.phone || currentUser.phone || '',
-      }))
-    }
-  }, [isCheckoutOpen, currentUser])
+    if (!isCheckoutOpen) return
+    setForm((f) => {
+      const next = { ...f }
+      // Prefill the chosen delivery location (sets pincode -> pricing zone too).
+      if (selectedAddress && !f.address) {
+        next.name = f.name || selectedAddress.name || ''
+        next.phone = f.phone || selectedAddress.phone || ''
+        next.address = selectedAddress.address || ''
+        next.city = selectedAddress.city || ''
+        next.state = selectedAddress.state || ''
+        next.pincode = selectedAddress.pincode || ''
+        next.country = selectedAddress.country || 'India'
+        next.labelType = selectedAddress.labelType || 'home'
+        next.customLabel = selectedAddress.customLabel || ''
+        if (selectedAddress.id) setSelectedAddressId(selectedAddress.id)
+      }
+      // Fall back to the signed-in user's name/phone.
+      if (currentUser) {
+        next.name = next.name || currentUser.name || ''
+        next.phone = next.phone || currentUser.phone || ''
+      }
+      return next
+    })
+  }, [isCheckoutOpen, currentUser, selectedAddress])
 
   // Apply a saved address to the form (fills name + phone + every shipping field
   // + the label tab + custom label).
@@ -143,6 +166,13 @@ export default function Checkout() {
     }
   }, [isCheckoutOpen])
 
+  // If the entered pincode isn't deliverable, force pickup.
+  useEffect(() => {
+    if (form.pincode.length === 6 && !deliveryAvailable(form.pincode) && fulfilment !== 'pickup') {
+      setFulfilment('pickup')
+    }
+  }, [form.pincode]) // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!isCheckoutOpen) return null
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -162,7 +192,19 @@ export default function Checkout() {
     return Object.keys(er).length === 0
   }
 
-  const orderedLines = lines.filter((l) => l.qty > 0)
+  // Prices change by delivery zone (decided by the pincode). Recompute each
+  // line's per-bag price + subtotal for the entered pincode; fall back to the
+  // default zone before a full pincode is typed.
+  const zone = zoneForPincode(form.pincode)
+  const canDeliver = form.pincode.length === 6 ? deliveryAvailable(form.pincode) : true
+  const shop = shopForPincode(form.pincode)
+  const orderedLines = lines
+    .filter((l) => l.qty > 0)
+    .map((l) => {
+      const price = priceFor(l.size, form.pincode)
+      return { ...l, price, subtotal: price * l.qty }
+    })
+  const orderSubtotal = orderedLines.reduce((s, l) => s + l.subtotal, 0)
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -180,14 +222,19 @@ export default function Checkout() {
         ...form,
         items,
         totalQty,
-        amount: subtotal * 100,
+        zone: zone.id,
+        fulfilment,
+        shop: fulfilment === 'pickup' ? shop.name : null,
+        amount: orderSubtotal * 100,
       })
       // Remember this order on this device so it shows up in Your Orders.
       saveLocalOrder({
         orderId: id,
         items,
         totalQty,
-        subtotal,
+        subtotal: orderSubtotal,
+        zone: zone.label,
+        fulfilment,
         name: form.name,
         phone: form.phone,
         address: form.address,
@@ -229,7 +276,7 @@ export default function Checkout() {
         <a className="checkout__brand" href="#home" onClick={closeCheckout} aria-label="MUTHU WIN SS KANGAYAM — back to home">
           <img className="checkout__logo" src="/winss-logo.webp" alt="MUTHU WIN SS KANGAYAM" />
         </a>
-        <h2 className="checkout__title">Checkout</h2>
+        <h2 className="checkout__title">{t('co.title')}</h2>
         <button className="checkout__close" onClick={closeCheckout} aria-label="Close checkout">×</button>
       </div>
 
@@ -240,15 +287,15 @@ export default function Checkout() {
             <div className="checkout__success-mark" aria-hidden="true">✦</div>
             <h3 className="checkout__success-heading">
               <SparklesText sparklesCount={14}>
-                Thank you for joining our family{orderName ? `, ${orderName}` : ''} 🌾
+                {t('co.thanks')}{orderName ? `, ${orderName}` : ''} 🌾
               </SparklesText>
             </h3>
             <p>
-              Your order has been received. Our team will reach out to you shortly to deliver the product.
+              {t('co.received')}
             </p>
 
             <div className="order-id-card">
-              <span className="order-id-card__label">Your Order ID</span>
+              <span className="order-id-card__label">{t('co.yourId')}</span>
               <div className="order-id-card__row">
                 <strong className="order-id-card__id">{orderId}</strong>
                 <button
@@ -260,23 +307,21 @@ export default function Checkout() {
                     setTimeout(() => setCopied(false), 1600)
                   }}
                   aria-label={copied ? 'Order ID copied' : 'Copy order ID'}
-                >{copied ? 'Copied!' : 'Copy'}</button>
+                >{copied ? t('co.copied') : t('co.copy')}</button>
               </div>
-              <span className="order-id-card__hint">Please mention this ID when we call to confirm.</span>
+              <span className="order-id-card__hint">{t('co.mention')}</span>
             </div>
 
             <div className="checkout__success-actions">
-              <button className="co-place" onClick={closeCheckout}>Continue browsing</button>
+              <button className="co-place" onClick={closeCheckout}>{t('cart.continue')}</button>
               <button
                 type="button"
                 className="track__ghost"
                 onClick={() => { closeCheckout(); openTrack() }}
               >
-                Track Order
+                {t('menu.track')}
               </button>
-              <p className="checkout__success-hint">
-                You can access <strong>Track Order</strong> anytime from the menu.
-              </p>
+              <p className="checkout__success-hint">{t('co.trackHint')}</p>
             </div>
           </div>
         ) : (
@@ -286,24 +331,24 @@ export default function Checkout() {
               {/* 1. Customer Info */}
               <section className="co-card">
                 <header className="co-card__head">
-                  <h3>Customer Info</h3>
-                  <span className="co-card__req">* Required</span>
+                  <h3>{t('co.customer')}</h3>
+                  <span className="co-card__req">{t('co.required')}</span>
                 </header>
 
                 <label className="co-field">
-                  <span>Full Name<i>*</i></span>
+                  <span>{t('co.fullName')}<i>*</i></span>
                   <input value={form.name} onChange={set('name')} placeholder="Enter full name" />
                   {errors.name && <em className="co-err">{errors.name}</em>}
                 </label>
 
                 <label className="co-field">
-                  <span>Phone<i>*</i></span>
+                  <span>{t('co.phone')}<i>*</i></span>
                   <input value={form.phone} onChange={set('phone')} placeholder="10-digit mobile" inputMode="numeric" />
                   {errors.phone && <em className="co-err">{errors.phone}</em>}
                 </label>
 
                 <label className="co-field">
-                  <span>Email <em>(optional)</em></span>
+                  <span>{t('co.email')} <em>{t('co.optional')}</em></span>
                   <input type="email" value={form.email} onChange={set('email')} placeholder="you@example.com" />
                   {errors.email && <em className="co-err">{errors.email}</em>}
                 </label>
@@ -312,15 +357,15 @@ export default function Checkout() {
               {/* 2. Shipping Address */}
               <section className="co-card">
                 <header className="co-card__head">
-                  <h3>Shipping Address</h3>
-                  <span className="co-card__req">* Required</span>
+                  <h3>{t('co.shipping')}</h3>
+                  <span className="co-card__req">{t('co.required')}</span>
                 </header>
 
                 {/* Saved addresses — picker at the top so the user can switch in one click */}
                 {savedAddresses.length > 0 && (
                   <div className="addr-picker">
                     <div className="addr-picker__head">
-                      <span className="addr-picker__label">Saved addresses</span>
+                      <span className="addr-picker__label">{t('co.savedAddresses')}</span>
                       {selectedAddressId && (
                         <button
                           type="button"
@@ -332,7 +377,7 @@ export default function Checkout() {
                               labelType: 'home', customLabel: '',
                             }))
                           }}
-                        >+ New address</button>
+                        >{t('co.newAddress')}</button>
                       )}
                     </div>
                     <ul className="addr-picker__list">
@@ -347,10 +392,10 @@ export default function Checkout() {
                               <span className="addr-card__icon" aria-hidden="true">{lab.icon}</span>
                               <span className="addr-card__body">
                                 <span className="addr-card__row">
-                                  <strong>{title}</strong>
-                                  {isCustom && <span className="addr-card__tag">{lab.label}</span>}
+                                  <strong>{isCustom ? title : labelName(a.labelType)}</strong>
+                                  {isCustom && <span className="addr-card__tag">{labelName(a.labelType)}</span>}
                                   {a.name && <em className="addr-card__name">{a.name}</em>}
-                                  {selected && <span className="addr-card__selected">Selected</span>}
+                                  {selected && <span className="addr-card__selected">✓</span>}
                                 </span>
                                 <span className="addr-card__line">
                                   {[a.address, a.city, a.state, a.pincode].filter(Boolean).join(', ')}
@@ -372,38 +417,38 @@ export default function Checkout() {
                 )}
 
                 <label className="co-field">
-                  <span>Street Address<i>*</i></span>
+                  <span>{t('co.street')}<i>*</i></span>
                   <textarea value={form.address} onChange={set('address')} rows={3} placeholder="Enter street address" />
                   {errors.address && <em className="co-err">{errors.address}</em>}
                 </label>
 
                 <div className="co-row co-row--3">
                   <label className="co-field">
-                    <span>City<i>*</i></span>
+                    <span>{t('co.city')}<i>*</i></span>
                     <input value={form.city} onChange={set('city')} placeholder="Enter city" />
                     {errors.city && <em className="co-err">{errors.city}</em>}
                   </label>
                   <label className="co-field">
-                    <span>State<i>*</i></span>
+                    <span>{t('co.state')}<i>*</i></span>
                     <input value={form.state} onChange={set('state')} placeholder="Enter state" />
                     {errors.state && <em className="co-err">{errors.state}</em>}
                   </label>
                   <label className="co-field">
-                    <span>Pincode<i>*</i></span>
+                    <span>{t('co.pincode')}<i>*</i></span>
                     <input value={form.pincode} onChange={set('pincode')} placeholder="6-digit" inputMode="numeric" />
                     {errors.pincode && <em className="co-err">{errors.pincode}</em>}
                   </label>
                 </div>
 
                 <label className="co-field">
-                  <span>Country<i>*</i></span>
+                  <span>{t('co.country')}<i>*</i></span>
                   <input value={form.country} onChange={set('country')} placeholder="Country" />
                   {errors.country && <em className="co-err">{errors.country}</em>}
                 </label>
 
                 {/* Address label tabs — Home / Work / Friend / Other */}
                 <div className="co-field addr-tabs-wrap">
-                  <span>Save this address as</span>
+                  <span>{t('co.saveAs')}</span>
                   <div className="addr-tabs" role="radiogroup" aria-label="Address label">
                     {ADDRESS_LABELS.map((l) => {
                       const checked = form.labelType === l.id
@@ -417,7 +462,7 @@ export default function Checkout() {
                           onClick={() => setForm((f) => ({ ...f, labelType: l.id }))}
                         >
                           <span className="addr-tab__icon" aria-hidden="true">{l.icon}</span>
-                          <span>{l.label}</span>
+                          <span>{labelName(l.id)}</span>
                         </button>
                       )
                     })}
@@ -426,7 +471,7 @@ export default function Checkout() {
 
                 {/* Optional custom label — overrides the tab name when shown in the picker */}
                 <label className="co-field addr-custom">
-                  <span>Or name this address <em>(optional)</em></span>
+                  <span>{t('co.nameAddr')} <em>{t('co.optional')}</em></span>
                   <input
                     value={form.customLabel}
                     onChange={set('customLabel')}
@@ -444,22 +489,67 @@ export default function Checkout() {
                   />
                   <span className="addr-save__box" aria-hidden="true" />
                   <span className="addr-save__text">
-                    Save this address for next time
+                    {t('co.saveForNext')}
                   </span>
                 </label>
+              </section>
+
+              {/* Delivery / Pickup + shop branch (driven by the pincode) */}
+              <section className="co-card">
+                <header className="co-card__head">
+                  <h3>{t('loc.howGet')}</h3>
+                </header>
+
+                <div className="locp__methods">
+                  <button
+                    type="button"
+                    className={`locp__method${fulfilment === 'delivery' ? ' is-active' : ''}${canDeliver ? '' : ' is-disabled'}`}
+                    disabled={!canDeliver}
+                    onClick={() => canDeliver && setFulfilment('delivery')}
+                  >
+                    <span className="locp__method-icon" aria-hidden="true">🚚</span>
+                    <span className="locp__method-body">
+                      <strong>{t('loc.delivery')}</strong>
+                      <span>{canDeliver ? t('loc.deliveryOk') : t('loc.deliveryNo')}</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`locp__method${fulfilment === 'pickup' ? ' is-active' : ''}`}
+                    onClick={() => setFulfilment('pickup')}
+                  >
+                    <span className="locp__method-icon" aria-hidden="true">🏬</span>
+                    <span className="locp__method-body">
+                      <strong>{t('loc.pickup')}</strong>
+                      <span>{t('loc.pickupDesc')}</span>
+                    </span>
+                  </button>
+                </div>
+
+                <div className="locp__shop">
+                  <span className="locp__shop-icon" aria-hidden="true">📍</span>
+                  <div className="locp__shop-body">
+                    <strong>{shop.name}</strong>
+                    <span>{shop.address}</span>
+                    <div className="locp__shop-actions">
+                      <a className="locp__shop-call" href={`tel:+${shop.phone}`}>✆ {t('loc.callShop')}</a>
+                      <a className="locp__shop-map" href={shop.mapsUrl} target="_blank" rel="noreferrer">{t('loc.directions')}</a>
+                    </div>
+                  </div>
+                </div>
               </section>
 
               {/* 3. Payment Info */}
               <section className="co-card">
                 <header className="co-card__head">
-                  <h3>Payment Info</h3>
-                  <span className="co-card__req co-card__req--soft">Choose one</span>
+                  <h3>{t('co.payment')}</h3>
+                  <span className="co-card__req co-card__req--soft">{t('co.chooseOne')}</span>
                 </header>
 
                 <div className="co-pay">
                   {[
-                    { id: 'cod', label: 'Cash on Delivery', desc: 'Pay in cash when your order arrives.' },
-                    { id: 'upi', label: 'UPI on Delivery',  desc: 'Scan & pay via UPI when the order is delivered.' },
+                    { id: 'cod', label: t('co.cod'), desc: t('co.codDesc') },
+                    { id: 'upi', label: t('co.upi'), desc: t('co.upiDesc') },
                   ].map((opt) => {
                     const checked = form.payment === opt.id
                     return (
@@ -480,7 +570,7 @@ export default function Checkout() {
                     )
                   })}
                 </div>
-                <p className="co-note">Online card/UPI checkout is coming soon.</p>
+                <p className="co-note">{t('co.payNote')}</p>
               </section>
             </div>
 
@@ -489,11 +579,11 @@ export default function Checkout() {
               {/* ITEM(S) IN ORDER */}
               <section className="co-card">
                 <header className="co-card__head">
-                  <h3>Item(s) in Order</h3>
+                  <h3>{t('co.items')}</h3>
                 </header>
 
                 {orderedLines.length === 0 ? (
-                  <p className="co-empty">Your bag is empty.</p>
+                  <p className="co-empty">{t('cart.title')}</p>
                 ) : (
                   <ul className="co-items">
                     {orderedLines.map((l) => (
@@ -501,7 +591,7 @@ export default function Checkout() {
                         <img src={PRODUCT.image} alt="" />
                         <div className="co-item__info">
                           <strong>{PRODUCT.shortName}</strong>
-                          <span>{l.size} &nbsp;·&nbsp; Qty {l.qty}</span>
+                          <span>{l.size} &nbsp;·&nbsp; {t('common.qty')} {l.qty}</span>
                         </div>
                         <div className="co-item__price">
                           ₹{l.subtotal.toLocaleString('en-IN')}
@@ -515,27 +605,32 @@ export default function Checkout() {
               {/* ORDER SUMMARY */}
               <section className="co-card">
                 <header className="co-card__head">
-                  <h3>Order Summary</h3>
+                  <h3>{t('co.summary')}</h3>
                 </header>
 
                 <div className="co-totals">
-                  <div className="co-total-row">
-                    <span>Subtotal</span>
-                    <span>₹{subtotal.toLocaleString('en-IN')}</span>
+                  <div className="co-total-row co-total-row--zone">
+                    <span>{t('co.rateZone')}</span>
+                    <span>{zone.label}</span>
                   </div>
                   <div className="co-total-row">
-                    <span>Taxes</span>
+                    <span>{t('co.subtotal')}</span>
+                    <span>₹{orderSubtotal.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="co-total-row">
+                    <span>{t('co.taxes')}</span>
                     <span>₹0</span>
                   </div>
                   <div className="co-total-row co-total-row--grand">
-                    <strong>Total</strong>
-                    <strong>₹{subtotal.toLocaleString('en-IN')}</strong>
+                    <strong>{t('co.total')}</strong>
+                    <strong>₹{orderSubtotal.toLocaleString('en-IN')}</strong>
                   </div>
                 </div>
+                <p className="co-note">{t('co.rateNote')}</p>
               </section>
 
               <button className="co-place" type="submit" disabled={status === 'sending'}>
-                {status === 'sending' ? 'Placing order…' : 'Place order'}
+                {status === 'sending' ? t('co.placing') : t('co.placeOrder')}
               </button>
               {errMsg && <p className="co-err co-err--bottom">{errMsg}</p>}
             </aside>

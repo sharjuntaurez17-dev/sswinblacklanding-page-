@@ -19,6 +19,17 @@ export function CartProvider({ children }) {
   const [trackTargetId, setTrackTargetId] = useState('')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser())
+  const [isLocationOpen, setIsLocationOpen] = useState(false)
+  const [isCareOpen, setIsCareOpen] = useState(false)
+  const [selectedAddress, setSelectedAddressState] = useState(() => {
+    try {
+      const s = localStorage.getItem('sswin.selectedAddr.v1')
+      return s ? JSON.parse(s) : null
+    } catch { return null }
+  })
+  const [fulfilment, setFulfilmentState] = useState(() => {
+    try { return localStorage.getItem('sswin.fulfilment.v1') || 'delivery' } catch { return 'delivery' }
+  })
 
   const value = useMemo(() => {
     const lines = PACKS.map((p) => {
@@ -74,8 +85,31 @@ export function CartProvider({ children }) {
       currentUser,
       setCurrentUser,
       logout: () => { authLogout(); setCurrentUser(null) },
+
+      // Selected delivery location (drives pincode pricing + checkout prefill)
+      isLocationOpen,
+      openLocation: () => { setIsOpen(false); setIsLocationOpen(true) },
+      closeLocation: () => setIsLocationOpen(false),
+      selectedAddress,
+      setSelectedAddress: (addr) => {
+        setSelectedAddressState(addr)
+        try {
+          if (addr) localStorage.setItem('sswin.selectedAddr.v1', JSON.stringify(addr))
+          else localStorage.removeItem('sswin.selectedAddr.v1')
+        } catch {}
+      },
+      fulfilment,
+      setFulfilment: (m) => {
+        setFulfilmentState(m)
+        try { localStorage.setItem('sswin.fulfilment.v1', m) } catch {}
+      },
+
+      // Customer care
+      isCareOpen,
+      openCare: () => { setIsOpen(false); setIsCareOpen(true) },
+      closeCare: () => setIsCareOpen(false),
     }
-  }, [quantities, isOpen, isCheckoutOpen, isTrackOpen, isOrdersOpen, trackTargetId, isAuthOpen, currentUser])
+  }, [quantities, isOpen, isCheckoutOpen, isTrackOpen, isOrdersOpen, trackTargetId, isAuthOpen, currentUser, isLocationOpen, selectedAddress, fulfilment, isCareOpen])
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

@@ -2,13 +2,15 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { PACKS } from '../lib/product.js'
+import { useLang } from '../context/LanguageContext.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const CHIPS = ['Nei Kichadi Ponni', 'Sortex Sorted', '100% Satisfaction', 'Naturally Rich']
+const CHIP_KEYS = ['hi.chip1', 'hi.chip2', 'hi.chip3', 'hi.chip4']
 
 export default function Highlights({ bagSrc }) {
   const ref = useRef(null)
+  const { t } = useLang()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -32,15 +34,12 @@ export default function Highlights({ bagSrc }) {
     <section className="highlights" id="product" ref={ref}>
       {/* Left: copy + Buy Now */}
       <div className="highlights__copy">
-        <span className="kicker">Premium Nei Kichadi Ponni</span>
-        <h2 className="highlights__title">Every grain, perfected.</h2>
-        <p className="highlights__lead">
-          Multi-stage Sortex colour sorting removes every impurity, leaving only
-          clean, uniform, naturally rich Nei Kichadi Ponni grains — sealed fresh in 5&nbsp;kg, 10&nbsp;kg and 26&nbsp;kg packs.
-        </p>
+        <span className="kicker">{t('hi.kicker')}</span>
+        <h2 className="highlights__title">{t('hi.title')}</h2>
+        <p className="highlights__lead">{t('hi.lead')}</p>
         <div className="chips">
-          {CHIPS.map((c) => (
-            <span className="chip" key={c}>{c}</span>
+          {CHIP_KEYS.map((c) => (
+            <span className="chip" key={c}>{t(c)}</span>
           ))}
         </div>
         <div className="highlights__packs">

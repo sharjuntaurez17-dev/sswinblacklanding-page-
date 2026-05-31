@@ -29,7 +29,7 @@ export function useLenis() {
       // that own their own scroll (cart drawer, checkout). Without this,
       // Lenis swallows the event and the overlay's internal scroll never moves.
       prevent: (node) =>
-        !!(node && node.closest && node.closest('.checkout, .cart, .orders, .auth')),
+        !!(node && node.closest && node.closest('.checkout, .cart, .orders, .auth, .locp, .care')),
     })
     lenisInstance = lenis
 

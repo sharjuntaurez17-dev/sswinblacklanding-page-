@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext.jsx'
 import { PRODUCT } from '../lib/product.js'
 import { getOrders, isDelivered } from '../lib/localOrders.js'
+import { useLang } from '../context/LanguageContext.jsx'
 
 // Green check-circle (recreates the delivered logo as an inline SVG).
 function DeliveredIcon() {
@@ -30,6 +31,7 @@ function fmtDate(ts) {
 
 export default function Orders() {
   const { isOrdersOpen, closeOrders, openTrack } = useCart()
+  const { t } = useLang()
   const [orders, setOrders] = useState([])
 
   // Lock background scroll while the overlay is open
@@ -53,7 +55,7 @@ export default function Orders() {
         <a className="checkout__brand" href="#home" onClick={closeOrders} aria-label="Home">
           <img className="checkout__logo" src="/winss-logo.webp" alt="MUTHU WIN SS KANGAYAM" />
         </a>
-        <h2 className="checkout__title">Your Orders</h2>
+        <h2 className="checkout__title">{t('or.title')}</h2>
         <button className="checkout__close" onClick={closeOrders} aria-label="Close">×</button>
       </div>
 
@@ -62,18 +64,15 @@ export default function Orders() {
           {orders.length === 0 ? (
             <div className="orders__empty">
               <div className="orders__empty-mark" aria-hidden="true">✦</div>
-              <h3>No orders yet</h3>
-              <p>
-                Once you place your first order it'll show up here, with the order ID and a
-                shortcut to track it.
-              </p>
-              <button className="co-place" onClick={closeOrders}>Browse the shop</button>
+              <h3>{t('or.empty')}</h3>
+              <p>{t('or.emptyDesc')}</p>
+              <button className="co-place" onClick={closeOrders}>{t('or.browse')}</button>
             </div>
           ) : (
             <>
               <div className="orders__head">
                 <span className="orders__count">
-                  {orders.length} order{orders.length === 1 ? '' : 's'} on this device
+                  {orders.length} {orders.length === 1 ? t('or.count') : t('or.countPlural')}
                 </span>
               </div>
 
@@ -84,7 +83,7 @@ export default function Orders() {
                   <li key={o.orderId} className="order-card">
                     <header className="order-card__head">
                       <div>
-                        <span className="order-card__label">Order ID</span>
+                        <span className="order-card__label">{t('or.orderId')}</span>
                         <strong className="order-card__id">{o.orderId}</strong>
                       </div>
                       <span className="order-card__date">{fmtDate(o.placedAt)}</span>
@@ -92,7 +91,7 @@ export default function Orders() {
 
                     {(o.name || o.address) && (
                       <div className="order-card__ship">
-                        <span className="order-card__ship-label">Delivering to</span>
+                        <span className="order-card__ship-label">{t('or.deliverTo')}</span>
                         <div className="order-card__ship-body">
                           {o.name && (
                             <strong className="order-card__ship-name">
@@ -114,7 +113,7 @@ export default function Orders() {
                           <img src={PRODUCT.image} alt="" />
                           <div className="order-card__item-info">
                             <strong>{PRODUCT.shortName}</strong>
-                            <span>{it.size} &nbsp;·&nbsp; Qty {it.qty} &nbsp;·&nbsp; ₹{it.price.toLocaleString('en-IN')} / bag</span>
+                            <span>{it.size} &nbsp;·&nbsp; {t('common.qty')} {it.qty} &nbsp;·&nbsp; ₹{it.price.toLocaleString('en-IN')} {t('cart.perBag')}</span>
                           </div>
                           <span className="order-card__item-total">₹{it.subtotal.toLocaleString('en-IN')}</span>
                         </li>
@@ -123,14 +122,14 @@ export default function Orders() {
 
                     <footer className="order-card__foot">
                       <div className="order-card__total">
-                        <span>Total</span>
+                        <span>{t('or.total')}</span>
                         <strong>₹{(o.subtotal ?? 0).toLocaleString('en-IN')}</strong>
                       </div>
                       <div className="order-card__actions">
                         {delivered ? (
                           <span className="delivered-badge">
                             <DeliveredIcon />
-                            Delivered
+                            {t('or.delivered')}
                           </span>
                         ) : (
                           <button
@@ -138,7 +137,7 @@ export default function Orders() {
                             className="co-place order-card__btn"
                             onClick={() => openTrack(o.orderId)}
                           >
-                            Track
+                            {t('or.track')}
                           </button>
                         )}
                       </div>

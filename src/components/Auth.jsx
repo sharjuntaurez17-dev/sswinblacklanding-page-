@@ -1,6 +1,7 @@
 import { useEffect, useState, Suspense, lazy } from 'react'
 import { useCart } from '../context/CartContext.jsx'
 import { login, signUp } from '../lib/auth.js'
+import { useLang } from '../context/LanguageContext.jsx'
 import Spotlight from './Spotlight.jsx'
 
 // Lazy-load the Spline scene — it's heavy and we only need it when the overlay
@@ -13,6 +14,7 @@ const SCENE_URL = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
 
 export default function Auth() {
   const { isAuthOpen, closeAuth, currentUser, setCurrentUser, logout: doLogout } = useCart()
+  const { t } = useLang()
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -61,25 +63,24 @@ export default function Auth() {
           <a className="checkout__brand" href="#home" onClick={closeAuth} aria-label="Home">
             <img className="checkout__logo" src="/winss-logo.webp" alt="" />
           </a>
-          <h2 className="checkout__title">Account</h2>
+          <h2 className="checkout__title">{t('au.welcomeBack')}</h2>
           <button className="checkout__close" onClick={closeAuth} aria-label="Close">×</button>
         </div>
         <div className="auth__body">
           <div className="auth__card">
             <Spotlight />
             <div className="auth__pane auth__pane--left">
-              <span className="auth__kicker">Signed in</span>
+              <span className="auth__kicker">{currentUser.name.split(/\s+/)[0]}</span>
               <h3 className="auth__title">
-                Welcome back, <em>{currentUser.name.split(/\s+/)[0]}</em>.
+                {t('au.welcomeBack')}
               </h3>
               <p className="auth__lead">
-                We'll use <strong>+91 {currentUser.phone}</strong> to find your orders and
-                addresses on this device. Sign out any time.
+                +91 {currentUser.phone}
               </p>
               <button
                 className="co-place auth__submit"
                 onClick={() => { doLogout(); closeAuth() }}
-              >Sign out</button>
+              >{t('au.signout')}</button>
             </div>
             <div className="auth__pane auth__pane--right">
               <Suspense fallback={<SceneFallback />}>
@@ -98,7 +99,7 @@ export default function Auth() {
         <a className="checkout__brand" href="#home" onClick={closeAuth} aria-label="Home">
           <img className="checkout__logo" src="/winss-logo.webp" alt="" />
         </a>
-        <h2 className="checkout__title">{mode === 'login' ? 'Log in' : 'Sign up'}</h2>
+        <h2 className="checkout__title">{mode === 'login' ? t('au.login') : t('au.signup')}</h2>
         <button className="checkout__close" onClick={closeAuth} aria-label="Close">×</button>
       </div>
 
@@ -108,14 +109,12 @@ export default function Auth() {
 
           {/* LEFT — form */}
           <div className="auth__pane auth__pane--left">
-            <span className="auth__kicker">Premium rice, on your terms</span>
+            <span className="auth__kicker">{t('hi.kicker')}</span>
             <h3 className="auth__title">
-              {mode === 'login' ? <>Welcome <em>back.</em></> : <>Join the <em>family.</em></>}
+              {mode === 'login' ? t('au.welcomeBack') : t('au.join')}
             </h3>
             <p className="auth__lead">
-              {mode === 'login'
-                ? 'Sign in with your phone number to see your saved orders and addresses.'
-                : 'Your phone number is your key — we use it to find your orders and deliver to your address.'}
+              {mode === 'login' ? t('au.loginLead') : t('au.signupLead')}
             </p>
 
             <div className="auth__tabs" role="tablist">
@@ -125,20 +124,20 @@ export default function Auth() {
                 aria-selected={mode === 'login'}
                 className={`auth__tab${mode === 'login' ? ' is-active' : ''}`}
                 onClick={() => setMode('login')}
-              >Log in</button>
+              >{t('au.login')}</button>
               <button
                 type="button"
                 role="tab"
                 aria-selected={mode === 'signup'}
                 className={`auth__tab${mode === 'signup' ? ' is-active' : ''}`}
                 onClick={() => setMode('signup')}
-              >Sign up</button>
+              >{t('au.signup')}</button>
             </div>
 
             <form className="auth__form" onSubmit={onSubmit} noValidate>
               {mode === 'signup' && (
                 <label className="co-field">
-                  <span>Full Name<i>*</i></span>
+                  <span>{t('co.fullName')}<i>*</i></span>
                   <input
                     autoFocus
                     value={name}
@@ -149,7 +148,7 @@ export default function Auth() {
               )}
 
               <label className="co-field">
-                <span>Phone<i>*</i></span>
+                <span>{t('co.phone')}<i>*</i></span>
                 <div className="auth__phone">
                   <span className="auth__phone-prefix">+91</span>
                   <input
@@ -166,14 +165,14 @@ export default function Auth() {
               {error && <p className="co-err co-err--bottom">{error}</p>}
 
               <button className="co-place auth__submit" type="submit" disabled={submitting}>
-                {submitting ? '…' : (mode === 'login' ? 'Continue' : 'Create account')}
+                {submitting ? '…' : (mode === 'login' ? t('au.continue') : t('au.create'))}
               </button>
 
               <p className="auth__switch">
                 {mode === 'login' ? (
-                  <>New here? <button type="button" onClick={() => { setMode('signup'); setError('') }}>Create an account</button></>
+                  <>{t('au.newHere')} <button type="button" onClick={() => { setMode('signup'); setError('') }}>{t('au.createOne')}</button></>
                 ) : (
-                  <>Already with us? <button type="button" onClick={() => { setMode('login'); setError('') }}>Log in</button></>
+                  <>{t('au.already')} <button type="button" onClick={() => { setMode('login'); setError('') }}>{t('au.login')}</button></>
                 )}
               </p>
             </form>

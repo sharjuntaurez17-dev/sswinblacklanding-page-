@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useLang } from '../context/LanguageContext.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const STATS = [
-  { value: '1000+', label: 'Happy Customers' },
-  { value: '60+',   label: 'Years of Trust' },
-  { value: '4.9★',  label: 'Average Rating' },
+  { value: '1000+', key: 'rv.stat.customers' },
+  { value: '60+',   key: 'rv.stat.years' },
+  { value: '4.9★',  key: 'rv.stat.rating' },
 ]
 
 // 20 reviews across the Kongu belt + Nilgiris of Tamil Nadu.
@@ -60,6 +61,7 @@ function ReviewCard({ r }) {
 
 export default function Reviews() {
   const ref = useRef(null)
+  const { t } = useLang()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -80,15 +82,15 @@ export default function Reviews() {
     <section className="reviews" id="reviews" ref={ref}>
       <div className="reviews__inner">
         <div className="reviews__head">
-          <span className="kicker">Loved across the Kongu belt</span>
-          <h2 className="reviews__title">Trusted by families for generations.</h2>
+          <span className="kicker">{t('rv.kicker')}</span>
+          <h2 className="reviews__title">{t('rv.title')}</h2>
         </div>
 
         <div className="reviews__stats">
           {STATS.map((s) => (
-            <div className="reviews__stat" key={s.label}>
+            <div className="reviews__stat" key={s.key}>
               <strong className="reviews__stat-value">{s.value}</strong>
-              <span className="reviews__stat-label">{s.label}</span>
+              <span className="reviews__stat-label">{t(s.key)}</span>
             </div>
           ))}
         </div>
